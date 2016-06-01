@@ -8,7 +8,6 @@ CSVFILE = 'contacts.csv'
 class ContactList
   def initialize
     Contact.get_csv(CSVFILE)
-    @contacts_list = Contact.all
     receive
   end
 
@@ -26,10 +25,10 @@ class ContactList
     end
 
     def receive
-      # TODO: Check how to greb correctly the inputs
-      ARGV << '--help' if ARGV.empty?
-      while !ARGV.empty? do 
-        operand(ARGV.shift)  
+      @commands = ARGV[0..-1]
+      @commands << '--help' if @commands.empty?
+      until @commands.empty? do 
+        operand(@commands.shift)  
       end
     end
 
@@ -38,20 +37,14 @@ class ContactList
       when '--help'
         help
       when '--list'
-        print_contacts(@contacts_list)
-        print_total(@contacts_list)
+        print_contacts(Contact.all)
+        print_total(Contact.all)
       when '--new'
-        name = ARGV.shift
-        email = ARGV.shift
-        unless Contact.search(email).empty?
-          puts "Duplicated email"
-          exit!
-        end
-        Contact.create(name, email)
+        create_contact(@commands.shift, @commands.shift)
       when '--show'
-        show(ARGV.shift)
+        show(@commands.shift)
       when '--search'
-        selected = Contact.search(ARGV.shift)
+        selected = Contact.search(@commands.shift)
         print_contacts(selected)
         print_total(selected)
       else
@@ -59,12 +52,19 @@ class ContactList
       end
     end
 
+    def create_contact(name, email)
+      unless Contact.search(email).empty?
+        puts "Duplicated email"
+        exit!
+      end
+      new_contact = Contact.create(name, email)
+      puts "Contact created succesfully. ID #{Contact.all.length}"
+    end
+
     def print_contacts(list)
       list.each_with_index do |contact, index|
-        puts "#{index + 1} : #{contact}\n"
-        if (index + 1) % 5 == 0 # Pagination for every 5 (wait for an enter to print the rest)
-          gets.chomp
-        end
+        puts contact
+        # gets if (index + 1) % 5 == 0 # Pagination for every 5 (wait for an enter to print the rest)
       end
     end
 
@@ -76,7 +76,7 @@ class ContactList
     def show(id)
       contact = Contact.find(id.to_i)
       if contact
-        puts "#{id} : #{contact}"
+        puts contact
       else
         puts "Not Found"
       end
@@ -85,4 +85,4 @@ class ContactList
 end
 
 
-ContactList.new
+ContactList.new if $0 == __FILE__
