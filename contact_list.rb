@@ -4,17 +4,13 @@ require_relative 'contact'
 
 CSVFILE = 'contacts.csv'
 
-# Interfaces between a user and their contact list. Reads from and writes to standard I/O.
 class ContactList
   def initialize
     Contact.get_csv(CSVFILE)
     receive
   end
 
-  # TODO: Implement user interaction. This should be the only file where you use `puts` and `gets`.
   private
-    # TODO: Implement a pretty print besides checking for single letters operators
-    # Use for example puts '%-3d %-5s %-26s %s' % [ln, *row.values_at('Make', 'Model', 'Description')
     def help
       puts "Here is a list of availabe commands:
       \t--new\t- Create a new contact
