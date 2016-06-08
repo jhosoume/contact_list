@@ -1,6 +1,28 @@
 #!/usr/bin/env ruby
 
+require 'pry'
+require 'byebug'
+require 'pg'
+require 'active_record'
 require_relative 'contact'
+
+DBNAME = 'contactbook'
+
+#ActiveRecord::Base.logger = Logger.new(STDOUT)
+
+puts 'Establishing connection to database ...'
+ActiveRecord::Base.establish_connection(
+  adapter: 'postgresql',
+  database: DBNAME,
+  username: 'development',
+  password: 'development',
+  host: 'localhost',
+  port: 5432,
+  pool: 5,
+  encoding: 'unicode',
+  min_messages: 'error'
+)
+puts 'CONNECTED'
 
 class ContactList
   def initialize
@@ -32,7 +54,7 @@ class ContactList
       when '--help'
         help
       when '--list'
-        print_contacts(Contact.all)
+        print_contacts(Contact.all.order(:id))
         print_total(Contact.all)
       when '--new'
         create_contact(@commands.shift, @commands.shift)
@@ -56,7 +78,7 @@ class ContactList
         puts "Duplicated email"
         exit!
       end
-      new_contact = Contact.create(name, email)
+      new_contact = Contact.create(name: name, email: email)
       puts "Contact created succesfully. ID #{new_contact.id}"
     end
 
@@ -70,7 +92,7 @@ class ContactList
     end
 
     def delete(id)
-      Contact.destroy(id)
+      Contact.find(id).destroy
       puts "Now, #{id} is no longer in the record"
     end
 
@@ -84,7 +106,7 @@ class ContactList
     end
 
     def update(id, name, email)
-      Contact.update(id, name, email)
+      Contact.find(id).update(name: name, email: email)
       puts "Contact of #{id} successfully updated!"
     end
 
