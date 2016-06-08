@@ -14,7 +14,9 @@ class ContactList
       \t--list\t- List all contacts
       \t--show\t- Show a contact
       \t--search\t- Search contacts
-      \t--help\t- Print all commands"
+      \t--help\t- Print all commands
+      \t--update\t- Update selected contact
+      \t--delete\t- Delete according to id"
     end
 
     def receive
@@ -40,6 +42,10 @@ class ContactList
         selected = Contact.search(@commands.shift)
         print_contacts(selected)
         print_total(selected)
+      when '--update'
+        update(@commands.shift, @commands.shift, @commands.shift)
+      when '--delete'
+        delete(@commands.shift) 
       else
         puts "Invalid command.\n"
       end
@@ -63,6 +69,11 @@ class ContactList
       puts "#{list.length} records total" 
     end
 
+    def delete(id)
+      Contact.destroy(id)
+      puts "Now, #{id} is no longer in the record"
+    end
+
     def show(id)
       contact = Contact.find(id.to_i)
       if contact
@@ -70,6 +81,11 @@ class ContactList
       else
         puts "Not Found"
       end
+    end
+
+    def update(id, name, email)
+      Contact.update(id, name, email)
+      puts "Contact of #{id} successfully updated!"
     end
 
 end

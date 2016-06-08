@@ -39,7 +39,7 @@ class Contact
   end
     
   def destroy
-    connection.exec("DELETE FROM contacts WHERE id = $1::int;", [id])
+    Contact.connection.exec("DELETE FROM contacts WHERE id = $1::int;", [id])
   end
 
   # Provides functionality for managing contacts in the contacts database.
@@ -58,7 +58,7 @@ class Contact
     # @return [Array<Contact>] Array of Contact objects
     def all
       connection.exec("SELECT * FROM contacts").map do |contact_info|
-        Contact.new(contact_info["name"], contact_info["email"], contact_info["id"].to_i) 
+        self.new(contact_info["name"], contact_info["email"], contact_info["id"].to_i) 
       end
     end
 
@@ -66,7 +66,7 @@ class Contact
     # @param name [String] the new contact's name
     # @param email [String] the contact's email
     def create(name, email)
-      Contact.new(name, email).save
+      self.new(name, email).save
     end
    
     # Find the Contact in the database file with the matching id.
@@ -78,7 +78,7 @@ class Contact
         nil
       else
           contact_info = contact_info.first
-          Contact.new(contact_info["name"], contact_info["email"], id)
+          self.new(contact_info["name"], contact_info["email"], id)
       end
     end
     
@@ -87,7 +87,7 @@ class Contact
     # @return [Array<Contact>] Array of Contact objects.
     def search(term)
       connection.exec("SELECT * FROM contacts WHERE name LIKE $1 OR email LIKE $1;", [term]).map do |contact_info|
-        Contact.new(contact_info["name"], contact_info["email"], contact_info["id"])
+        self.new(contact_info["name"], contact_info["email"], contact_info["id"])
       end 
       # all.select { |contact| contact.name == term || contact.email == term }
     end
@@ -100,7 +100,7 @@ class Contact
     end
 
     def destroy(id)
-      Contact.find(id).destroy    
+      self.find(id).destroy    
     end
 
   end
