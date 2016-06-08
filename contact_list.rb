@@ -2,11 +2,8 @@
 
 require_relative 'contact'
 
-CSVFILE = 'contacts.csv'
-
 class ContactList
   def initialize
-    Contact.get_csv(CSVFILE)
     receive
   end
 
@@ -54,14 +51,11 @@ class ContactList
         exit!
       end
       new_contact = Contact.create(name, email)
-      puts "Contact created succesfully. ID #{Contact.all.length}"
+      puts "Contact created succesfully. ID #{new_contact.id}"
     end
 
     def print_contacts(list)
-      list.each_with_index do |contact, index|
-        puts contact
-        # gets if (index + 1) % 5 == 0 # Pagination for every 5 (wait for an enter to print the rest)
-      end
+      list.each { |contact| puts contact } 
     end
 
     def print_total(list)
